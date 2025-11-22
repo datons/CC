@@ -95,13 +95,7 @@ Edit `.vscode/mcp.json` and add your keys to the `env` section of each server:
 
 **Note:** The PubMed server requires both `NCBI_USER_EMAIL` and `NCBI_USER_API_KEY`. The FDA API key is optional.
 
-### 4. Reload VS Code
-
-After adding your API keys:
-1. Open Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
-2. Run "Developer: Reload Window"
-
-### 5. Start Using AI Chat
+### 4. Start Using AI Chat
 
 Open GitHub Copilot Chat (Ctrl+Shift+I or Cmd+Shift+I) and try these example prompts.
 
@@ -282,8 +276,8 @@ Generate a comprehensive analysis of COVID-19 vaccine research from the past 6 m
 
 **Solution:**
 1. Verify `.vscode/mcp.json` contains correct API keys in the `env` section
-2. Reload VS Code window (Cmd/Ctrl+Shift+P → "Developer: Reload Window")
-3. For PubMed, ensure both `NCBI_USER_EMAIL` and `NCBI_USER_API_KEY` are set
+2. For PubMed, ensure both `NCBI_USER_EMAIL` and `NCBI_USER_API_KEY` are set
+3. Save the file - changes take effect immediately
 
 ### MCP Server Not Responding
 
@@ -295,7 +289,7 @@ Generate a comprehensive analysis of COVID-19 vaccine research from the past 6 m
    ```bash
    ls -la mcp-servers/
    ```
-3. Reload VS Code window (Cmd/Ctrl+Shift+P → "Developer: Reload Window")
+3. Try using the `#pubmed` or `#openfda` prefix in your message
 
 ## Learning Resources
 

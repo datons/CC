@@ -35,19 +35,5 @@
 
   "postCreateCommand": "bash .devcontainer/post-create.sh",
 
-  "remoteEnv": {
-    "NCBI_USER_EMAIL": "${localEnv:NCBI_USER_EMAIL}",
-    "NCBI_USER_API_KEY": "${localEnv:NCBI_USER_API_KEY}",
-    "FDA_API_KEY": "${localEnv:FDA_API_KEY}"
-  },
-
-  "forwardPorts": [8000, 8080],
-
-  "mounts": [
-    "source=${localWorkspaceFolder}/.env,target=/workspaces/${localWorkspaceFolderBasename}/.env,type=bind,consistency=cached"
-  ],
-
-  "containerEnv": {
-    "WORKSPACE_FOLDER": "${containerWorkspaceFolder}"
-  }
+  "forwardPorts": [8000, 8080]
 }
