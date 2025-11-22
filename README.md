@@ -2,7 +2,7 @@
 
 Learn to interact with AI assistants using real-world medical and pharmaceutical data through Model Context Protocol (MCP) servers.
 
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/YOUR_USERNAME/YOUR_REPO)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/datons/CC)
 
 ## What You'll Learn
 
