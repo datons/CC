@@ -19,7 +19,8 @@
         "ms-python.vscode-pylance",
         "ms-toolsai.jupyter",
         "github.copilot",
-        "github.copilot-chat"
+        "github.copilot-chat",
+        "vscode-icons-team.vscode-icons"
       ],
       "settings": {
         "python.defaultInterpreterPath": "/usr/local/bin/python",

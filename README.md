@@ -67,6 +67,50 @@ After adding your API keys:
 
 This ensures environment variables are loaded.
 
+#### Alternative: Where to put PubMed (NCBI) and FDA credentials
+
+You can provide PubMed (NCBI) and OpenFDA credentials in any of the following ways.
+
+- **Temporary (current shell session):**
+   ```bash
+   export NCBI_USER_EMAIL="your.email@example.com"
+   export NCBI_USER_API_KEY="your_ncbi_api_key"
+   export FDA_API_KEY="your_fda_api_key"
+   ```
+
+- **Project `.env` (recommended for reproducible Codespaces):**
+   Add the variables to a `.env` file (either at the repository root or the server subfolder):
+   ```env
+   NCBI_USER_EMAIL="your.email@example.com"
+   NCBI_USER_API_KEY="your_ncbi_api_key"
+   FDA_API_KEY="your_fda_api_key"
+   ```
+
+- **VS Code MCP server config (`.vscode/mcp.json`):**
+   Inject the variables into the server `env` block for the appropriate server. Examples:
+   ```jsonc
+   // PubMed server entry
+   "pubmed": {
+      "env": {
+         "NCBI_USER_EMAIL": "YOUR_NCBI_EMAIL",
+         "NCBI_USER_API_KEY": "YOUR_NCBI_API_KEY"
+      }
+   }
+
+   // OpenFDA server entry
+   "openfda": {
+      "env": {
+         "FDA_API_KEY": "YOUR_FDA_API_KEY"
+      }
+   }
+   ```
+
+Notes:
+- The PubMed MCP server requires a contact email (`NCBI_USER_EMAIL`) — NCBI requests a valid email address for API usage.
+- `FDA_API_KEY` is optional for basic queries but increases rate limits when provided.
+- Avoid committing long-lived keys to public repos; prefer workspace-only secrets or secret managers for shared projects.
+- After changing env vars in `.vscode/mcp.json` or a `.env` file, restart the MCP server or reload the VS Code window so the changes are picked up.
+
 ### 4. Start Using AI Chat
 
 Open GitHub Copilot Chat (Ctrl+Shift+I or Cmd+Shift+I) and try these queries:
@@ -102,7 +146,48 @@ Look up labeling information for diabetes medications manufactured by Novo Nordi
 Find all FDA-approved drugs for hypertension
 ```
 
+**Referencing MCP tools in chat**
+
+You can hint or instruct the assistant to use a specific MCP server or its tools by prefixing the server short name with a hash (`#`) anywhere in your message. Examples:
+
+- `#pubmed` — ask the assistant to use PubMed MCP tools for searches and analysis.
+- `#openfda` — ask the assistant to use OpenFDA MCP tools for FDA data.
+
+Placing the tag at the start of your message (for example, `#pubmed Search for recent CRISPR publications`) makes the intent explicit, but it also works anywhere in the text.
+
+
 ## MCP Servers Included
+
+**Adding MCP Servers in VS Code**
+
+Follow these steps to register the included MCP servers with your editor so GitHub Copilot Chat (or other MCP-capable extensions) can communicate with them:
+
+1. **Open Command Palette:** Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (macOS).
+2. **Run Add MCP Server:** Type `MCP: Add MCP Server` (or `Add MCP Server`) and select the command.
+3. **Choose Connection Type:** When prompted for the connection, choose `stdio`.
+e. **Provide Command:** When prompted for the command to launch the server, paste the following pattern, replacing `{path}` with the full path to the server start script or entry point:
+5. **Select Target:** When prompted for the target/where to register the server, choose **`Workspace`** so the server is registered for this repository.
+
+    ```bash
+    bash -c "{path}"
+    ```
+
+    Examples:
+
+   - PubMed (Python, using virtualenv):
+      ```bash
+      bash -c "source /workspaces/CC/mcp-servers/pubmearch/.venv/bin/activate && python -m pubmearch.server"
+      ```
+
+    - OpenFDA (Node):
+       ```bash
+       bash -c "node /workspaces/CC/mcp-servers/OpenFDA-MCP-Server/build/index.js"
+       ```
+
+Notes:
+- Use the full absolute path to the server launcher so the editor can start it reliably.
+- Ensure required runtimes are installed in your environment (`python3` for PubMed, `node` for OpenFDA) and any dependencies are installed.
+- After adding the server, reload the VS Code window (Command Palette → `Developer: Reload Window`) if the MCP server does not appear immediately.
 
 ### 1. PubMed MCP Server
 Query and analyze medical literature from PubMed.
