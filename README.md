@@ -26,168 +26,165 @@ The environment will automatically set up with:
 - GitHub Copilot extensions
 - Both MCP servers (PubMed and OpenFDA)
 
-### 2. Configure API Keys
+### 2. Add MCP Servers
 
-After the Codespace launches:
+After the Codespace launches, add the MCP servers through VS Code:
 
-1. Copy the example environment file:
-   ```bash
-   cp .env.example .env
-   ```
+1. **Open Command Palette:** Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (macOS)
+2. **Run Add MCP Server:** Type `MCP: Add MCP Server` and select the command
+3. **Choose Connection Type:** Select `stdio`
+4. **Add PubMed Server:**
+   - Command: `bash`
+   - Args: `-c "source /workspaces/CC/mcp-servers/pubmearch/.venv/bin/activate && python -m pubmearch.server"`
+   - Target: **Workspace**
 
-2. Edit `.env` and add your API keys:
-   ```bash
-   # PubMed API (Required)
-   NCBI_USER_EMAIL=your_email@example.com
-   NCBI_USER_API_KEY=your_api_key
+5. **Add OpenFDA Server:**
+   - Command: `bash`
+   - Args: `-c "node /workspaces/CC/mcp-servers/OpenFDA-MCP-Server/build/index.js"`
+   - Target: **Workspace**
 
-   # FDA API (Optional - higher rate limits)
-   FDA_API_KEY=your_fda_api_key
-   ```
+### 3. Configure API Keys
+
+After adding the servers, edit `.vscode/mcp.json` to add your API keys:
 
 #### Getting API Keys
 
-**PubMed API Key** (Required for PubMed queries):
+**PubMed API Key** (Required):
 1. Go to [NCBI Account Settings](https://www.ncbi.nlm.nih.gov/account/settings/)
 2. Log in or create an account
 3. Scroll to "API Keys" section
 4. Click "Create API Key"
 
-**FDA API Key** (Optional - increases rate limit):
+**FDA API Key** (Optional - increases rate limit from 1,000 to 120,000 requests/hour):
 1. Visit [openFDA Authentication](https://open.fda.gov/apis/authentication/)
 2. Sign up for an API key
-3. Without key: 1,000 requests/hour
-4. With key: 120,000 requests/hour
 
-### 3. Restart Codespace
+#### Add Keys to `.vscode/mcp.json`
+
+Edit `.vscode/mcp.json` and add your keys to the `env` section of each server:
+
+```json
+{
+  "servers": {
+    "pubmed": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [
+        "-c",
+        "source /workspaces/CC/mcp-servers/pubmearch/.venv/bin/activate && python -m pubmearch.server"
+      ],
+      "env": {
+        "NCBI_USER_EMAIL": "your_email@example.com",
+        "NCBI_USER_API_KEY": "your_pubmed_api_key"
+      }
+    },
+    "openfda": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [
+        "-c",
+        "node /workspaces/CC/mcp-servers/OpenFDA-MCP-Server/build/index.js"
+      ],
+      "env": {
+        "FDA_API_KEY": "your_fda_api_key"
+      }
+    }
+  }
+}
+```
+
+**Note:** The PubMed server requires both `NCBI_USER_EMAIL` and `NCBI_USER_API_KEY`. The FDA API key is optional.
+
+### 4. Reload VS Code
 
 After adding your API keys:
-1. Click the gear icon in the bottom left
-2. Select "Codespaces: Rebuild Container"
+1. Open Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
+2. Run "Developer: Reload Window"
 
-This ensures environment variables are loaded.
+### 5. Start Using AI Chat
 
-#### Alternative: Where to put PubMed (NCBI) and FDA credentials
+Open GitHub Copilot Chat (Ctrl+Shift+I or Cmd+Shift+I) and try these example prompts.
 
-You can provide PubMed (NCBI) and OpenFDA credentials in any of the following ways.
+**Tip:** Use `#pubmed` or `#openfda` at the start of your message to tell the AI which MCP server to use.
 
-- **Temporary (current shell session):**
-   ```bash
-   export NCBI_USER_EMAIL="your.email@example.com"
-   export NCBI_USER_API_KEY="your_ncbi_api_key"
-   export FDA_API_KEY="your_fda_api_key"
-   ```
+#### PubMed Research Examples
 
-- **Project `.env` (recommended for reproducible Codespaces):**
-   Add the variables to a `.env` file (either at the repository root or the server subfolder):
-   ```env
-   NCBI_USER_EMAIL="your.email@example.com"
-   NCBI_USER_API_KEY="your_ncbi_api_key"
-   FDA_API_KEY="your_fda_api_key"
-   ```
-
-- **VS Code MCP server config (`.vscode/mcp.json`):**
-   Inject the variables into the server `env` block for the appropriate server. Examples:
-   ```jsonc
-   // PubMed server entry
-   "pubmed": {
-      "env": {
-         "NCBI_USER_EMAIL": "YOUR_NCBI_EMAIL",
-         "NCBI_USER_API_KEY": "YOUR_NCBI_API_KEY"
-      }
-   }
-
-   // OpenFDA server entry
-   "openfda": {
-      "env": {
-         "FDA_API_KEY": "YOUR_FDA_API_KEY"
-      }
-   }
-   ```
-
-Notes:
-- The PubMed MCP server requires a contact email (`NCBI_USER_EMAIL`) — NCBI requests a valid email address for API usage.
-- `FDA_API_KEY` is optional for basic queries but increases rate limits when provided.
-- Avoid committing long-lived keys to public repos; prefer workspace-only secrets or secret managers for shared projects.
-- After changing env vars in `.vscode/mcp.json` or a `.env` file, restart the MCP server or reload the VS Code window so the changes are picked up.
-
-### 4. Start Using AI Chat
-
-Open GitHub Copilot Chat (Ctrl+Shift+I or Cmd+Shift+I) and try these queries:
-
-**PubMed Examples:**
 ```
-Search PubMed for recent studies on cancer immunotherapy from the last 3 months
+#pubmed Find recent studies about diabetes treatment
 ```
 
 ```
-Analyze research hotspots in prostate cancer treatment. Use the search query:
-((prostat*[Title/Abstract]) AND (cancer[Title/Abstract]))
+#pubmed What are the latest papers on Alzheimer's disease?
 ```
 
 ```
-Show me publication trends for CRISPR gene editing over the past year
-```
-
-**FDA Examples:**
-```
-Find adverse events reported for aspirin in 2023
+#pubmed Show me research trends for COVID-19 vaccines
 ```
 
 ```
-Search for drug recalls related to contamination in the last 6 months
+#pubmed Search for studies about heart disease prevention published in the last year
 ```
 
 ```
-Look up labeling information for diabetes medications manufactured by Novo Nordisk
+#pubmed Find papers about cancer immunotherapy from 2024
 ```
 
 ```
-Find all FDA-approved drugs for hypertension
+#pubmed What's the latest research on obesity and mental health?
 ```
 
-**Referencing MCP tools in chat**
+```
+#pubmed Search for studies comparing different diabetes medications
+```
 
-You can hint or instruct the assistant to use a specific MCP server or its tools by prefixing the server short name with a hash (`#`) anywhere in your message. Examples:
+```
+#pubmed Find research about sleep disorders and their treatments
+```
 
-- `#pubmed` — ask the assistant to use PubMed MCP tools for searches and analysis.
-- `#openfda` — ask the assistant to use OpenFDA MCP tools for FDA data.
+#### FDA Drug & Device Examples
 
-Placing the tag at the start of your message (for example, `#pubmed Search for recent CRISPR publications`) makes the intent explicit, but it also works anywhere in the text.
+```
+#openfda Find side effects reported for ibuprofen
+```
+
+```
+#openfda What adverse events have been reported for insulin?
+```
+
+```
+#openfda Show me recent drug recalls
+```
+
+```
+#openfda Find all FDA-approved medications for high blood pressure
+```
+
+```
+#openfda What drugs were recalled due to contamination?
+```
+
+```
+#openfda Search for adverse events related to pacemakers
+```
+
+```
+#openfda Find information about diabetes medications made by Novo Nordisk
+```
+
+```
+#openfda What are the reported side effects of aspirin?
+```
+
+```
+#openfda Show me drug shortages for antibiotics
+```
+
+```
+#openfda Find recalls of medical devices in the last 6 months
+```
 
 
 ## MCP Servers Included
-
-**Adding MCP Servers in VS Code**
-
-Follow these steps to register the included MCP servers with your editor so GitHub Copilot Chat (or other MCP-capable extensions) can communicate with them:
-
-1. **Open Command Palette:** Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (macOS).
-2. **Run Add MCP Server:** Type `MCP: Add MCP Server` (or `Add MCP Server`) and select the command.
-3. **Choose Connection Type:** When prompted for the connection, choose `stdio`.
-e. **Provide Command:** When prompted for the command to launch the server, paste the following pattern, replacing `{path}` with the full path to the server start script or entry point:
-5. **Select Target:** When prompted for the target/where to register the server, choose **`Workspace`** so the server is registered for this repository.
-
-    ```bash
-    bash -c "{path}"
-    ```
-
-    Examples:
-
-   - PubMed (Python, using virtualenv):
-      ```bash
-      bash -c "source /workspaces/CC/mcp-servers/pubmearch/.venv/bin/activate && python -m pubmearch.server"
-      ```
-
-    - OpenFDA (Node):
-       ```bash
-       bash -c "node /workspaces/CC/mcp-servers/OpenFDA-MCP-Server/build/index.js"
-       ```
-
-Notes:
-- Use the full absolute path to the server launcher so the editor can start it reliably.
-- Ensure required runtimes are installed in your environment (`python3` for PubMed, `node` for OpenFDA) and any dependencies are installed.
-- After adding the server, reload the VS Code window (Command Palette → `Developer: Reload Window`) if the MCP server does not appear immediately.
 
 ### 1. PubMed MCP Server
 Query and analyze medical literature from PubMed.
@@ -232,12 +229,11 @@ Access FDA databases for drugs and medical devices.
 ├── .devcontainer/          # Codespaces configuration
 │   ├── devcontainer.json   # Container settings
 │   └── post-create.sh      # Setup script
+├── .vscode/
+│   └── mcp.json            # MCP server configuration (you create this)
 ├── mcp-servers/            # MCP server installations (auto-generated)
 │   ├── pubmearch/          # PubMed MCP server
 │   └── OpenFDA-MCP-Server/ # FDA MCP server
-├── outputs/                # Query results and reports
-├── notebooks/              # Jupyter notebooks for analysis
-├── .env.example            # API key template
 └── README.md               # This file
 ```
 
@@ -285,30 +281,21 @@ Generate a comprehensive analysis of COVID-19 vaccine research from the past 6 m
 **Problem:** "Authentication failed" or "Rate limit exceeded"
 
 **Solution:**
-1. Verify `.env` file contains correct API keys
-2. Rebuild the container (Codespaces: Rebuild Container)
-3. For PubMed, ensure email and API key are both set
+1. Verify `.vscode/mcp.json` contains correct API keys in the `env` section
+2. Reload VS Code window (Cmd/Ctrl+Shift+P → "Developer: Reload Window")
+3. For PubMed, ensure both `NCBI_USER_EMAIL` and `NCBI_USER_API_KEY` are set
 
 ### MCP Server Not Responding
 
 **Problem:** Chat doesn't recognize PubMed/FDA queries
 
 **Solution:**
-1. Check `.mcp.json` exists in workspace root
-2. Restart VSCode window (Cmd/Ctrl+Shift+P → "Reload Window")
-3. Check the post-create script ran successfully:
+1. Check `.vscode/mcp.json` exists and has both servers configured
+2. Verify the MCP servers were installed:
    ```bash
    ls -la mcp-servers/
    ```
-
-### Import Errors
-
-**Problem:** Python modules not found
-
-**Solution:**
-```bash
-pip install anthropic openai python-dotenv
-```
+3. Reload VS Code window (Cmd/Ctrl+Shift+P → "Developer: Reload Window")
 
 ## Learning Resources
 
