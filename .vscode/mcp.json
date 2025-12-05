@@ -1,0 +1,20 @@
+{
+  "servers": {
+    "openfda": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [
+        "-c",
+        "source /workspaces/CC/.env 2>/dev/null; node /workspaces/CC/mcp-servers/OpenFDA-MCP-Server/build/index.js"
+      ]
+    },
+    "pubmed": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [
+        "-c",
+        "source /workspaces/CC/.env 2>/dev/null; source /workspaces/CC/mcp-servers/pubmearch/.venv/bin/activate && python -m pubmearch.server"
+      ]
+    }
+  }
+}

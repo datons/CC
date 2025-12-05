@@ -45,7 +45,22 @@ After the Codespace launches, add the MCP servers through VS Code:
 
 ### 3. Configure API Keys
 
-After adding the servers, edit `.vscode/mcp.json` to add your API keys:
+Create a `.env` file from the template:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add your API keys:
+
+```bash
+# PubMed API (Required)
+export NCBI_USER_EMAIL="your_email@example.com"
+export NCBI_USER_API_KEY="your_api_key"
+
+# FDA API (Optional - increases rate limit)
+export FDA_API_KEY="your_fda_key"
+```
 
 #### Getting API Keys
 
@@ -58,42 +73,6 @@ After adding the servers, edit `.vscode/mcp.json` to add your API keys:
 **FDA API Key** (Optional - increases rate limit from 1,000 to 120,000 requests/hour):
 1. Visit [openFDA Authentication](https://open.fda.gov/apis/authentication/)
 2. Sign up for an API key
-
-#### Add Keys to `.vscode/mcp.json`
-
-Edit `.vscode/mcp.json` and add your keys to the `env` section of each server:
-
-```json
-{
-  "servers": {
-    "pubmed": {
-      "type": "stdio",
-      "command": "bash",
-      "args": [
-        "-c",
-        "source /workspaces/CC/mcp-servers/pubmearch/.venv/bin/activate && python -m pubmearch.server"
-      ],
-      "env": {
-        "NCBI_USER_EMAIL": "your_email@example.com",
-        "NCBI_USER_API_KEY": "your_pubmed_api_key"
-      }
-    },
-    "openfda": {
-      "type": "stdio",
-      "command": "bash",
-      "args": [
-        "-c",
-        "node /workspaces/CC/mcp-servers/OpenFDA-MCP-Server/build/index.js"
-      ],
-      "env": {
-        "FDA_API_KEY": "your_fda_api_key"
-      }
-    }
-  }
-}
-```
-
-**Note:** The PubMed server requires both `NCBI_USER_EMAIL` and `NCBI_USER_API_KEY`. The FDA API key is optional.
 
 ### 4. Start Using AI Chat
 
@@ -224,7 +203,9 @@ Access FDA databases for drugs and medical devices.
 │   ├── devcontainer.json   # Container settings
 │   └── post-create.sh      # Setup script
 ├── .vscode/
-│   └── mcp.json            # MCP server configuration (you create this)
+│   └── mcp.json            # MCP server configuration
+├── .env.example            # API keys template
+├── .env                    # Your API keys (create from template)
 ├── mcp-servers/            # MCP server installations (auto-generated)
 │   ├── pubmearch/          # PubMed MCP server
 │   └── OpenFDA-MCP-Server/ # FDA MCP server
@@ -275,7 +256,7 @@ Generate a comprehensive analysis of COVID-19 vaccine research from the past 6 m
 **Problem:** "Authentication failed" or "Rate limit exceeded"
 
 **Solution:**
-1. Verify `.vscode/mcp.json` contains correct API keys in the `env` section
+1. Verify `.env` file exists and contains correct API keys
 2. For PubMed, ensure both `NCBI_USER_EMAIL` and `NCBI_USER_API_KEY` are set
 3. Save the file - changes take effect immediately
 
@@ -284,7 +265,7 @@ Generate a comprehensive analysis of COVID-19 vaccine research from the past 6 m
 **Problem:** Chat doesn't recognize PubMed/FDA queries
 
 **Solution:**
-1. Check `.vscode/mcp.json` exists and has both servers configured
+1. Check `.env` file exists with your API keys
 2. Verify the MCP servers were installed:
    ```bash
    ls -la mcp-servers/
